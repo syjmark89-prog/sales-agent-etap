@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full scroll-smooth dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marcus Vance | Senior Sales Specialist & Digital Card</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            400: '#facc15',
+                            500: '#eab308',
+                            600: '#ca8a04',
+                        },
+                        glass: {
+                            card: 'rgba(15, 23, 42, 0.75)',
+                            border: 'rgba(255, 255, 255, 0.12)',
+                            input: 'rgba(30, 41, 59, 0.7)',
+                            hover: 'rgba(255, 255, 255, 0.08)'
+                        },
+                        whatsapp: '#25D366',
+                        facebook: '#1877F2'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'glass-glow': '0 0 30px -5px rgba(16, 185, 129, 0.15)',
+                        'gold-glow': '0 0 25px -5px rgba(234, 179, 8, 0.25)'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #030712;
+            color: #f3f4f6;
+        }
+
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-pill {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .editable-field:hover {
+            outline: 2px dashed #ca8a04;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .editable-active {
+            outline: 2px dashed #facc15 !important;
+            background: rgba(234, 179, 8, 0.1) !important;
+        }
+
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.8; }
+        }
+        .glow-bg {
+            animation: pulseGlow 8s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col relative overflow-x-hidden pb-20 md:pb-8">
+
+    <div class="fixed top-0 left-1/4 w-96 h-96 bg-emerald-600/20 rounded-full blur-3xl pointer-events-none -z-10 glow-bg"></div>
+    <div class="fixed bottom-10 right-10 w-96 h-96 bg-amber-500/15 rounded-full blur-3xl pointer-events-none -z-10 glow-bg" style="animation-delay: 4s;"></div>
+
+    <header class="sticky top-0 z-40 glass-panel border-b border-white/10 px-4 py-3">
+        <div class="max-w-4xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-emerald-500 flex items-center justify-center text-slate-950 font-black shadow-lg">
+                    <i data-lucide="shield-check" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <span id="agentCompanyText" class="font-bold text-sm text-slate-100 block tracking-tight">APEX LUXURY REALTY</span>
+                    <span class="text-[10px] text-emerald-400 font-semibold flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> NFC Digital Card Active
+                    </span>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-2 sm:space-x-3">
+                <button onclick="toggleEditMode()" id="editToggleBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500/30 transition">
+                    <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                    <span id="editToggleText" class="hidden sm:inline">Edit Details</span>
+                </button>
+
+                <button onclick="openModal('nfcModal')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/30 transition">
+                    <i data-lucide="wifi" class="w-3.5 h-3.5"></i>
+                    <span class="hidden sm:inline">NFC Setup</span>
+                </button>
+
+                <button onclick="showQRCodeModal()" class="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition" title="Show QR Code">
+                    <i data-lucide="qr-code" class="w-4 h-4"></i>
+                </button>
+
+                <button onclick="downloadVCard()" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white text-slate-950 hover:bg-slate-200 transition shadow-md">
+                    <i data-lucide="contact" class="w-3.5 h-3.5"></i>
+                    <span>Save Contact</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-4xl w-full mx-auto px-4 py-6 space-y-6">
+
+        <div class="glass-panel rounded-3xl overflow-hidden shadow-2xl relative">
+            <div class="relative h-48 sm:h-60 w-full overflow-hidden">
+                <img id="coverImg" src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=1200" alt="Company Cover" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
+                <button onclick="triggerImageUpload('cover')" class="edit-only hidden absolute top-3 right-3 bg-slate-900/80 text-white text-xs px-3 py-1.5 rounded-lg backdrop-blur flex items-center gap-1 hover:bg-slate-900">
+                    <i data-lucide="camera" class="w-3.5 h-3.5"></i> Change Cover
+                </button>
+            </div>
+
+            <div class="px-6 pb-6 relative -mt-16 sm:-mt-20 flex flex-col md:flex-row md:items-end justify-between gap-6">
+                <div class="flex flex-col sm:flex-row items-center sm:items-end gap-5 text-center sm:text-left">
+                    <div class="relative group">
+                        <img id="avatarImg" src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=400" alt="Marcus Vance" class="w-28 h-28 sm:w-36 sm:h-36 rounded-2xl object-cover border-4 border-slate-900 shadow-2xl">
+                        <button onclick="triggerImageUpload('avatar')" class="edit-only hidden absolute inset-0 bg-black/60 rounded-2xl flex items-center justify-center text-white text-xs font-bold">
+                            <i data-lucide="camera" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+
+                    <div class="space-y-1">
+                        <div class="flex items-center justify-center sm:justify-start gap-2">
+                            <h1 id="agentName" class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight editable-field" data-key="name">Marcus Vance</h1>
+                            <i data-lucide="badge-check" class="w-5 h-5 text-emerald-400"></i>
+                        </div>
+                        <p id="agentTitle" class="text-xs sm:text-sm font-semibold text-amber-400 editable-field" data-key="title">Senior Luxury Real Estate Broker</p>
+                        <p id="agentSub" class="text-xs text-slate-400 editable-field" data-key="agency">Apex Property Group • Miami Beach & Brickell</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-center gap-2">
+                    <a href="https://wa.me/13055550192?text=Hello%20Marcus,%20I%20tapped%20your%20NFC%20card%20and%20would%20like%20to%20connect." target="_blank" class="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs px-4 py-3 rounded-xl transition shadow-lg shadow-emerald-500/20">
+                        <i data-lucide="message-circle" class="w-4 h-4"></i>
+                        <span>WhatsApp Chat</span>
+                    </a>
+                    <a href="#booking-section" class="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white font-bold text-xs px-4 py-3 rounded-xl transition border border-white/10">
+                        <i data-lucide="calendar" class="w-4 h-4"></i>
+                        <span>Book Call</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-3 border-t border-white/10 divide-x divide-white/10 text-center py-3 bg-slate-900/40">
+                <div>
+                    <div id="stat1Val" class="text-sm sm:text-base font-extrabold text-white editable-field" data-key="stat1Val">$240M+</div>
+                    <div id="stat1Lbl" class="text-[10px] text-slate-400 uppercase tracking-wider editable-field" data-key="stat1Lbl">Sales Volume</div>
+                </div>
+                <div>
+                    <div id="stat2Val" class="text-sm sm:text-base font-extrabold text-white editable-field" data-key="stat2Val">14+ Yrs</div>
+                    <div id="stat2Lbl" class="text-[10px] text-slate-400 uppercase tracking-wider editable-field" data-key="stat2Lbl">Experience</div>
+                </div>
+                <div>
+                    <div id="stat3Val" class="text-sm sm:text-base font-extrabold text-white editable-field" data-key="stat3Val">99.4%</div>
+                    <div id="stat3Lbl" class="text-[10px] text-slate-400 uppercase tracking-wider editable-field" data-key="stat3Lbl">Client Rating</div>
+                </div>
+            </div>
+        </div>
+
+        <section class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <a id="phoneBtn" href="tel:+13055550192" class="glass-panel p-3.5 rounded-2xl flex items-center gap-3 hover:bg-white/5 transition group border border-white/10">
+                <div class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center group-hover:scale-110 transition shrink-0">
+                    <i data-lucide="phone-call" class="w-5 h-5"></i>
+                </div>
+                <div class="overflow-hidden">
+                    <div class="text-[10px] text-slate-400 font-semibold uppercase">Phone Call</div>
+                    <div id="phoneDisplay" class="text-xs font-bold text-white truncate editable-field" data-key="phone">+1 305 555 0192</div>
+                </div>
+            </a>
+
+            <a id="waBtn" href="https://wa.me/13055550192" target="_blank" class="glass-panel p-3.5 rounded-2xl flex items-center gap-3 hover:bg-emerald-500/10 transition group border border-emerald-500/20">
+                <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center group-hover:scale-110 transition shrink-0">
+                    <i data-lucide="message-square" class="w-5 h-5"></i>
+                </div>
+                <div class="overflow-hidden">
+                    <div class="text-[10px] text-emerald-400 font-semibold uppercase">WhatsApp</div>
+                    <div id="waDisplay" class="text-xs font-bold text-white truncate editable-field" data-key="whatsapp">+1 305 555 0192</div>
+                </div>
+            </a>
+
+            <a id="fbBtn" href="https://facebook.com" target="_blank" class="glass-panel p-3.5 rounded-2xl flex items-center gap-3 hover:bg-blue-600/10 transition group border border-blue-500/20">
+                <div class="w-10 h-10 rounded-xl bg-blue-600/20 text-blue-400 flex items-center justify-center group-hover:scale-110 transition shrink-0">
+                    <i data-lucide="facebook" class="w-5 h-5"></i>
+                </div>
+                <div class="overflow-hidden">
+                    <div class="text-[10px] text-blue-400 font-semibold uppercase">Facebook</div>
+                    <div id="fbDisplay" class="text-xs font-bold text-white truncate editable-field" data-key="facebook">@marcusvance.realty</div>
+                </div>
+            </a>
+
+            <a id="emailBtn" href="mailto:marcus.vance@apexrealestate.com" class="glass-panel p-3.5 rounded-2xl flex items-center gap-3 hover:bg-amber-500/10 transition group border border-amber-500/20">
+                <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center group-hover:scale-110 transition shrink-0">
+                    <i data-lucide="mail" class="w-5 h-5"></i>
+                </div>
+                <div class="overflow-hidden">
+                    <div class="text-[10px] text-amber-400 font-semibold uppercase">Email</div>
+                    <div id="emailDisplay" class="text-xs font-bold text-white truncate editable-field" data-key="email">marcus@apex.com</div>
+                </div>
+            </a>
+        </section>
+
+        <section class="glass-panel rounded-3xl p-6 space-y-6">
+            <div class="flex items-center space-x-2 border-b border-white/10 pb-3 overflow-x-auto hide-scrollbar">
+                <button onclick="switchTab('about')" id="tab-about" class="tab-btn px-4 py-2 rounded-xl text-xs font-bold transition bg-white text-slate-950">
+                    About & Credentials
+                </button>
+                <button onclick="switchTab('listings')" id="tab-listings" class="tab-btn px-4 py-2 rounded-xl text-xs font-bold transition text-slate-400 hover:text-white">
+                    Featured Portfolio
+                </button>
+                <button onclick="switchTab('calc')" id="tab-calc" class="tab-btn px-4 py-2 rounded-xl text-xs font-bold transition text-slate-400 hover:text-white">
+                    Mortgage Calculator
+                </button>
+            </div>
+
+            <div id="panel-about" class="tab-panel space-y-4">
+                <h3 class="text-sm font-bold uppercase tracking-wider text-amber-400">Executive Bio</h3>
+                <p id="agentBio" class="text-xs sm:text-sm text-slate-300 leading-relaxed editable-field" data-key="bio">
+                    Marcus Vance represents high-net-worth buyers, investors, and homeowners in luxury markets. Specializing in off-market waterfront estates, luxury penthouses, and commercial developments, Marcus combines data-driven market analytics with total transaction confidentiality.
+                </p>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+                    <div class="glass-pill p-3.5 rounded-2xl space-y-1">
+                        <div class="text-[10px] text-slate-400 uppercase font-semibold">Specialty</div>
+                        <div id="specDisplay" class="text-xs font-bold text-white editable-field" data-key="specialty">Luxury Waterfront & Penthouses</div>
+                    </div>
+                    <div class="glass-pill p-3.5 rounded-2xl space-y-1">
+                        <div class="text-[10px] text-slate-400 uppercase font-semibold">Languages</div>
+                        <div id="langDisplay" class="text-xs font-bold text-white editable-field" data-key="languages">English, Spanish, French</div>
+                    </div>
+                    <div class="glass-pill p-3.5 rounded-2xl space-y-1">
+                        <div class="text-[10px] text-slate-400 uppercase font-semibold">License ID</div>
+                        <div id="licDisplay" class="text-xs font-bold text-emerald-400 editable-field" data-key="license">FL-RE# 38920192</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="panel-listings" class="tab-panel hidden space-y-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-amber-400">Exclusive Portfolio</h3>
+                    <button onclick="addListingItem()" class="edit-only hidden text-xs bg-emerald-500/20 text-emerald-300 px-3 py-1 rounded-lg border border-emerald-500/30">
+                        + Add Property
+                    </button>
+                </div>
+
+                <div id="listingsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+            </div>
+
+            <div id="panel-calc" class="tab-panel hidden space-y-4">
+                <h3 class="text-sm font-bold uppercase tracking-wider text-amber-400">Mortgage & Investment Calculator</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-900/60 p-4 rounded-2xl border border-white/10">
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between text-xs font-bold mb-1">
+                                <span class="text-slate-300">Home Price</span>
+                                <span id="priceValDisplay" class="text-emerald-400">$2,500,000</span>
+                            </div>
+                            <input type="range" id="priceRange" min="200000" max="15000000" step="50000" value="2500000" oninput="updateMortgage()" class="w-full accent-emerald-500">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-xs font-bold mb-1">
+                                <span class="text-slate-300">Down Payment (20%)</span>
+                                <span id="downValDisplay" class="text-emerald-400">$500,000</span>
+                            </div>
+                            <input type="range" id="downRange" min="5" max="50" step="5" value="20" oninput="updateMortgage()" class="w-full accent-emerald-500">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="text-[10px] text-slate-400 uppercase font-bold block mb-1">Interest Rate (%)</label>
+                                <input type="number" id="interestInput" value="6.5" step="0.1" oninput="updateMortgage()" class="w-full bg-slate-800 border border-white/10 rounded-xl px-3 py-2 text-xs font-bold text-white focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-slate-400 uppercase font-bold block mb-1">Loan Term (Yrs)</label>
+                                <select id="termInput" onchange="updateMortgage()" class="w-full bg-slate-800 border border-white/10 rounded-xl px-3 py-2 text-xs font-bold text-white focus:outline-none">
+                                    <option value="30">30 Years</option>
+                                    <option value="15">15 Years</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col justify-center items-center p-4 bg-slate-950/80 rounded-xl border border-white/10 text-center space-y-2">
+                        <span class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Estimated Monthly Payment</span>
+                        <div id="monthlyPaymentDisplay" class="text-3xl font-extrabold text-amber-400">$12,641</div>
+                        <span class="text-[10px] text-slate-400">Includes principal, interest, taxes & insurance</span>
+                        <a href="https://wa.me/13055550192?text=Hello%20Marcus,%20I%20used%20your%20mortgage%20calculator%20and%20would%20like%20financing%20advice." target="_blank" class="mt-2 text-xs text-emerald-400 hover:underline font-semibold flex items-center gap-1">
+                            <i data-lucide="message-circle" class="w-3.5 h-3.5"></i> Discuss Financing Options
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="booking-section" class="glass-panel rounded-3xl p-6 space-y-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-base font-bold text-white">Book a Consultation</h3>
+                    <p class="text-xs text-slate-400">Schedule a 1-on-1 private call or meeting with Marcus</p>
+                </div>
+                <div class="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center">
+                    <i data-lucide="calendar-check" class="w-5 h-5"></i>
+                </div>
+            </div>
+
+            <form onsubmit="handleBookingSubmit(event)" class="space-y-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <input type="text" placeholder="Your Name" required class="bg-slate-900/80 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500">
+                    <input type="tel" placeholder="Phone Number" required class="bg-slate-900/80 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500">
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <input type="date" required class="bg-slate-900/80 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500">
+                    <select class="bg-slate-900/80 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500">
+                        <option>10:00 AM - Morning</option>
+                        <option>02:00 PM - Afternoon</option>
+                        <option>05:00 PM - Evening</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-bold text-xs py-3 rounded-xl transition shadow-lg">
+                    Confirm Appointment Request
+                </button>
+            </form>
+        </section>
+
+    </main>
+
+    <div class="md:hidden fixed bottom-0 left-0 right-0 z-40 glass-panel border-t border-white/10 px-4 py-2.5 flex items-center justify-around">
+        <a href="tel:+13055550192" class="flex flex-col items-center text-slate-300 hover:text-white">
+            <i data-lucide="phone" class="w-5 h-5 text-blue-400"></i>
+            <span class="text-[10px] font-bold mt-1">Call</span>
+        </a>
+        <a href="https://wa.me/13055550192" target="_blank" class="flex flex-col items-center text-slate-300 hover:text-white">
+            <i data-lucide="message-circle" class="w-5 h-5 text-emerald-400"></i>
+            <span class="text-[10px] font-bold mt-1">WhatsApp</span>
+        </a>
+        <button onclick="downloadVCard()" class="flex flex-col items-center text-slate-300 hover:text-white">
+            <i data-lucide="user-plus" class="w-5 h-5 text-amber-400"></i>
+            <span class="text-[10px] font-bold mt-1">Save</span>
+        </button>
+        <button onclick="showQRCodeModal()" class="flex flex-col items-center text-slate-300 hover:text-white">
+            <i data-lucide="qr-code" class="w-5 h-5 text-purple-400"></i>
+            <span class="text-[10px] font-bold mt-1">QR Code</span>
+        </button>
+    </div>
+
+    <div id="nfcModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="glass-panel border border-white/20 rounded-3xl max-w-lg w-full p-6 space-y-5 relative text-white">
+            <button onclick="closeModal('nfcModal')" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                    <i data-lucide="wifi" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-base">Make Profile Public & Program NFC Card</h3>
+                    <p class="text-xs text-slate-400">How to publish your link online and program your smart card</p>
+                </div>
+            </div>
+
+            <div class="space-y-3 text-xs text-slate-300 leading-relaxed max-h-80 overflow-y-auto pr-2">
+                <div class="p-3 bg-slate-900/80 rounded-xl border border-white/10 space-y-1">
+                    <div class="font-bold text-amber-400">Step 1: Host Free Online</div>
+                    <p>Upload this <code>index.html</code> file to free web hosting platforms like <strong>GitHub Pages</strong>, <strong>Vercel</strong>, <strong>Netlify</strong>, or <strong>Cloudflare Pages</strong> to get a live HTTPS web address (e.g., <code>https://yourname.vercel.app</code>).</p>
+                </div>
+
+                <div class="p-3 bg-slate-900/80 rounded-xl border border-white/10 space-y-1">
+                    <div class="font-bold text-emerald-400">Step 2: Copy Live Webpage URL</div>
+                    <p>Copy your public link or use the current URL button below to save to your clipboard.</p>
+                </div>
+
+                <div class="p-3 bg-slate-900/80 rounded-xl border border-white/10 space-y-1">
+                    <div class="font-bold text-blue-400">Step 3: Program Your Physical NFC Card</div>
+                    <p>Download free mobile apps like <strong>NFC Tools</strong> (App Store or Google Play Store), tap <em>Write Record -> Add URL</em>, paste your public link, and tap your phone against your blank NFC card/tag.</p>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between gap-3 pt-2">
+                <button onclick="copyCurrentURL()" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold text-xs py-2.5 rounded-xl transition flex items-center justify-center gap-1.5">
+                    <i data-lucide="copy" class="w-4 h-4"></i> Copy Webpage URL
+                </button>
+                <button onclick="closeModal('nfcModal')" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="qrModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="glass-panel border border-white/20 rounded-3xl max-w-sm w-full p-6 text-center space-y-4 relative">
+            <button onclick="closeModal('qrModal')" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            <h3 class="font-bold text-white text-base">Scan Digital Card</h3>
+            <p class="text-xs text-slate-400">Point phone camera to open profile directly</p>
+
+            <div class="bg-white p-4 rounded-2xl inline-block mx-auto shadow-2xl">
+                <div id="qrcode"></div>
+            </div>
+
+            <button onclick="copyCurrentURL()" class="w-full bg-white/10 hover:bg-white/20 text-white font-bold text-xs py-2.5 rounded-xl transition border border-white/10 flex items-center justify-center gap-1.5">
+                <i data-lucide="link" class="w-3.5 h-3.5"></i> Copy Profile Link
+            </button>
+        </div>
+    </div>
+
+    <input type="file" id="imageFileInput" accept="image/*" class="hidden" onchange="handleImageSelected(event)">
+
+    <script>
+        let editMode = false;
+        let activeImageTarget = null;
+
+        const defaultProfile = {
+            name: "Marcus Vance",
+            title: "Senior Luxury Real Estate Broker",
+            agency: "Apex Property Group • Miami Beach & Brickell",
+            phone: "+1 305 555 0192",
+            whatsapp: "+1 305 555 0192",
+            facebook: "@marcusvance.realty",
+            email: "marcus.vance@apexrealestate.com",
+            bio: "Marcus Vance represents high-net-worth buyers, investors, and homeowners in luxury markets. Specializing in off-market waterfront estates, luxury penthouses, and commercial developments, Marcus combines data-driven market analytics with total transaction confidentiality.",
+            specialty: "Luxury Waterfront & Penthouses",
+            languages: "English, Spanish, French",
+            license: "FL-RE# 38920192",
+            stat1Val: "$240M+",
+            stat1Lbl: "Sales Volume",
+            stat2Val: "14+ Yrs",
+            stat2Lbl: "Experience",
+            stat3Val: "99.4%",
+            stat3Lbl: "Client Rating",
+            coverUrl: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=1200",
+            avatarUrl: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=400",
+            listings: [
+                {
+                    title: "Oceanview Sky Penthouse",
+                    price: "$4,850,000",
+                    location: "Brickell Key, Miami",
+                    details: "4 Beds • 4.5 Baths • 4,200 sqft",
+                    image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&q=80&w=600"
+                },
+                {
+                    title: "Modern Waterfront Villa",
+                    price: "$8,200,000",
+                    location: "Star Island, Miami Beach",
+                    details: "6 Beds • 7 Baths • 6,800 sqft",
+                    image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=600"
+                }
+            ]
+        };
+
+        let profileData = JSON.parse(localStorage.getItem('luxuryAgentProfile')) || defaultProfile;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            lucide.createIcons();
+            loadProfileToUI();
+            updateMortgage();
+        });
+
+        function loadProfileToUI() {
+            document.querySelectorAll('.editable-field').forEach(el => {
+                const key = el.getAttribute('data-key');
+                if (key && profileData[key]) {
+                    el.textContent = profileData[key];
+                }
+            });
+
+            document.getElementById('coverImg').src = profileData.coverUrl;
+            document.getElementById('avatarImg').src = profileData.avatarUrl;
+
+            const cleanPhone = profileData.phone.replace(/[^0-9+]/g, '');
+            document.getElementById('phoneBtn').href = `tel:${cleanPhone}`;
+            document.getElementById('waBtn').href = `https://wa.me/${cleanPhone.replace('+', '')}?text=Hello%20${encodeURIComponent(profileData.name)},%20I%20tapped%20your%20NFC%20card.`;
+            document.getElementById('emailBtn').href = `mailto:${profileData.email}`;
+
+            renderListings();
+        }
+
+        function renderListings() {
+            const grid = document.getElementById('listingsGrid');
+            grid.innerHTML = profileData.listings.map((item, index) => `
+                <div class="glass-panel border border-white/10 rounded-2xl overflow-hidden group">
+                    <div class="relative h-40 overflow-hidden">
+                        <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <span class="absolute top-2 left-2 bg-slate-950/80 text-amber-400 text-[10px] font-bold px-2 py-0.5 rounded-md backdrop-blur">${item.price}</span>
+                        ${editMode ? `<button onclick="removeListing(${index})" class="absolute top-2 right-2 bg-red-600 text-white text-[10px] px-2 py-0.5 rounded">Delete</button>` : ''}
+                    </div>
+                    <div class="p-3.5 space-y-1">
+                        <h4 class="font-bold text-xs text-white">${item.title}</h4>
+                        <p class="text-[10px] text-slate-400">${item.location}</p>
+                        <div class="text-[10px] text-emerald-400 font-medium pt-1 border-t border-white/10">${item.details}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleEditMode() {
+            editMode = !editMode;
+            const textEl = document.getElementById('editToggleText');
+            const editBtns = document.querySelectorAll('.edit-only');
+
+            if (editMode) {
+                textEl.textContent = "Save Changes";
+                editBtns.forEach(btn => btn.classList.remove('hidden'));
+
+                document.querySelectorAll('.editable-field').forEach(el => {
+                    el.setAttribute('contenteditable', 'true');
+                    el.classList.add('editable-field');
+
+                    el.onblur = function() {
+                        const key = this.getAttribute('data-key');
+                        if (key) {
+                            profileData[key] = this.textContent.trim();
+                            saveProfile();
+                        }
+                    };
+                });
+            } else {
+                textEl.textContent = "Edit Details";
+                editBtns.forEach(btn => btn.classList.add('hidden'));
+
+                document.querySelectorAll('.editable-field').forEach(el => {
+                    el.removeAttribute('contenteditable');
+                });
+
+                saveProfile();
+                loadProfileToUI();
+                alert("All profile edits saved successfully!");
+            }
+        }
+
+        function saveProfile() {
+            localStorage.setItem('luxuryAgentProfile', JSON.stringify(profileData));
+        }
+
+        function triggerImageUpload(target) {
+            activeImageTarget = target;
+            document.getElementById('imageFileInput').click();
+        }
+
+        function handleImageSelected(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                if (activeImageTarget === 'cover') {
+                    profileData.coverUrl = evt.target.result;
+                    document.getElementById('coverImg').src = evt.target.result;
+                } else if (activeImageTarget === 'avatar') {
+                    profileData.avatarUrl = evt.target.result;
+                    document.getElementById('avatarImg').src = evt.target.result;
+                }
+                saveProfile();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function addListingItem() {
+            const title = prompt("Property Title:", "Modern Skyline Condo");
+            const price = prompt("Price:", "$1,250,000");
+            const location = prompt("Location:", "Downtown Financial District");
+            if (title && price) {
+                profileData.listings.push({
+                    title,
+                    price,
+                    location: location || "Miami, FL",
+                    details: "3 Beds • 2.5 Baths • 1,900 sqft",
+                    image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&q=80&w=600"
+                });
+                saveProfile();
+                renderListings();
+            }
+        }
+
+        function removeListing(index) {
+            profileData.listings.splice(index, 1);
+            saveProfile();
+            renderListings();
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(b => {
+                b.classList.remove('bg-white', 'text-slate-950');
+                b.classList.add('text-slate-400');
+            });
+
+            document.getElementById(`panel-${tabName}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-${tabName}`);
+            activeBtn.classList.remove('text-slate-400');
+            activeBtn.classList.add('bg-white', 'text-slate-950');
+        }
+
+        function updateMortgage() {
+            const price = parseFloat(document.getElementById('priceRange').value);
+            const downPct = parseFloat(document.getElementById('downRange').value);
+            const rate = parseFloat(document.getElementById('interestInput').value) / 100 / 12;
+            const years = parseInt(document.getElementById('termInput').value);
+            const months = years * 12;
+
+            const downAmt = price * (downPct / 100);
+            const loanAmt = price - downAmt;
+
+            document.getElementById('priceValDisplay').textContent = `$${price.toLocaleString()}`;
+            document.getElementById('downValDisplay').textContent = `$${downAmt.toLocaleString()}`;
+
+            let monthlyPrincipal = 0;
+            if (rate > 0) {
+                monthlyPrincipal = (loanAmt * rate * Math.pow(1 + rate, months)) / (Math.pow(1 + rate, months) - 1);
+            } else {
+                monthlyPrincipal = loanAmt / months;
+            }
+
+            const estimatedTaxesIns = (price * 0.012) / 12;
+            const totalMonthly = Math.round(monthlyPrincipal + estimatedTaxesIns);
+
+            document.getElementById('monthlyPaymentDisplay').textContent = `$${totalMonthly.toLocaleString()}`;
+        }
+
+        function downloadVCard() {
+            const vCardData = `BEGIN:VCARD
+VERSION:3.0
+FN:${profileData.name}
+TITLE:${profileData.title}
+ORG:${profileData.agency}
+TEL;TYPE=CELL:${profileData.phone}
+EMAIL:${profileData.email}
+URL:${window.location.href}
+NOTE:${profileData.specialty}
+END:VCARD`;
+
+            const blob = new Blob([vCardData], { type: "text/vcard" });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `${profileData.name.replace(/\s+/g, '_')}_Contact.vcf`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+        function showQRCodeModal() {
+            openModal('qrModal');
+            const container = document.getElementById('qrcode');
+            container.innerHTML = "";
+            new QRCode(container, {
+                text: window.location.href,
+                width: 180,
+                height: 180,
+                colorDark : "#030712",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+        }
+
+        function copyCurrentURL() {
+            const tempInput = document.createElement("input");
+            tempInput.value = window.location.href;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+            alert("URL copied to clipboard! Program this link into your NFC card using NFC Tools app.");
+        }
+
+        function handleBookingSubmit(e) {
+            e.preventDefault();
+            alert(`Appointment request sent to ${profileData.name}! You will receive a confirmation message shortly.`);
+            e.target.reset();
+        }
+    </script>
+</body>
+</html>
